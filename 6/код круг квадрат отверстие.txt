@@ -1,0 +1,65 @@
+#include <iostream>
+
+using namespace std;
+
+class RoundPeg
+{ //Класс круглый колышек
+private:
+	int radius;
+public:
+	RoundPeg() {}
+	RoundPeg(int radius) {this->radius = radius;}
+	virtual int getRadius() { return radius; }
+};
+
+class RoundHole
+{ //Класс Круглое отверстие
+private:
+	int radius;
+public:
+	RoundHole(int radius) :radius{ radius } {};
+	int getRadius() { return radius; }
+	bool fits(RoundPeg* peg) {return this->getRadius() >= peg->getRadius();}
+};
+
+class SquarePeg 
+{ //Класс Квадратный колышек
+private:
+	int width;
+public:
+	SquarePeg(int width) :width{ width } {}
+	int getWidth() { return width; }
+};
+
+class SquarePegAdapter : public RoundPeg 
+{ //Адаптер вычисляет наименьший радиус окружности, в которую можно вписать квадратный колышек, и представляет его как
+											//круглый колышек с этим радиусом.
+private:
+	SquarePeg* peg;
+public:
+	SquarePegAdapter(SquarePeg* peg_) :peg{ peg_ } {}
+	int getRadius() override { return peg->getWidth() * sqrt(2) / 2; }
+};
+
+int main()
+{
+	system("chcp 1251");
+	RoundHole* hole = new RoundHole(5);
+	cout << "Радиус круглого отверстия (hole): " << hole->getRadius() << "\n";
+	RoundPeg* rpeg = new RoundPeg(5);
+	cout << "Радиус круглого колышка (rpeg): " << rpeg->getRadius() << "\n";
+	if (hole->fits(rpeg)) cout << "Круглое отверстие (hole) с радиусом " << hole->getRadius() << " совместимо с круглым колышком (rpeg) с радиусом " << rpeg->getRadius() << "\n";
+	SquarePeg* small_sqpeg = new SquarePeg(5);
+	cout << "Ширина квадраного колышка (small_sqpeg) равна " << small_sqpeg->getWidth() << "\n";
+	SquarePeg* large_sqpeg = new SquarePeg(10);
+	cout << "Ширина квадраного колышка (large_sqpeg) равна " << large_sqpeg->getWidth() << "\n";
+	SquarePegAdapter* small_sqpeg_adapter = new SquarePegAdapter(small_sqpeg);
+	cout << "Адаптер small_sqpeg_adapter. Наименьший радиус окружности, в которую можно вписать квадратный колышек (small_sqpeg) равен " << small_sqpeg_adapter->getRadius() << "\n";
+	SquarePegAdapter* large_sqpeg_adapter = new SquarePegAdapter(large_sqpeg);
+	cout << "Адаптер large_sqpeg_adapter. Наименьший радиус окружности, в которую можно вписать квадратный колышек (large_sqpeg) равен " << large_sqpeg_adapter->getRadius() << "\n";
+	if (hole->fits(small_sqpeg_adapter)) cout << "Квадратный колышек (small_sqpeg) впишется в круглое отверстие (hole)\n";
+	if (hole->fits(large_sqpeg_adapter)) cout << "Квадратный колышек (large_sqpeg) впишется в круглое отверстие (hole)\n"; else cout << "Квадратный колышек (large_sqpeg) не впишется в круглое отверстие (hole)\n";
+	return 0;
+}
+
+

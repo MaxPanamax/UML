@@ -1,0 +1,133 @@
+#include <iostream>
+#include<vector>
+#include<string>
+
+using namespace std;
+//паттер строитель - требуется когда они достаточно сложный требуют пошаговой реализации.
+class Produkt
+{
+public:
+	vector<string>parts_;
+	void ListParets()const
+	{
+		cout << "части продукта: \n";
+		for (int i = 0; i < parts_.size(); i++)
+		{
+			if (parts_[i] == parts_.back())
+			{
+				cout << parts_[i];
+			}
+			else
+			{
+				cout << parts_[i] << ", ";
+			}
+		}
+		cout << endl << endl;
+	}
+	Produkt() {}
+	~Produkt() {}
+
+private:
+
+};
+class Bilder
+{
+public:
+
+	Bilder() {}
+	virtual~Bilder() {}
+	virtual void producPartA()const = 0;//чисто виртуальная функция
+	virtual void producPartB()const = 0;
+	virtual void producPartC()const = 0;
+private:
+
+};
+
+class concretBilder1 :public Bilder
+{
+public:
+	concretBilder1() { this->reset(); }
+	void reset() { this->produkt = new Produkt; }
+	~concretBilder1() { delete produkt; }
+	void producPartA()const override { this->produkt->parts_.push_back("partA1"); }
+	void producPartB()const override { this->produkt->parts_.push_back("partB1"); }
+	void producPartC()const override { this->produkt->parts_.push_back("partC1"); }
+	Produkt* getProduct() { Produkt* result = this->produkt; this->reset(); return result; }
+private:
+	Produkt* produkt;
+};
+class concretBilder2 :public Bilder
+{
+public:
+	concretBilder2() { this->reset(); }
+	void reset() { this->produkt = new Produkt; }
+	~concretBilder2() { delete produkt; }
+	void producPartA()const override { this->produkt->parts_.push_back("partA2"); }
+	void producPartB()const override { this->produkt->parts_.push_back("partB2"); }
+	void producPartC()const override { this->produkt->parts_.push_back("partC2"); }
+	Produkt* getProduct() { Produkt* result = this->produkt; this->reset(); return result; }
+private:
+	Produkt* produkt;
+};
+class Direktor
+{
+public:
+	void set_bilder(Bilder* bilder) { this->bilder = bilder; }
+	void BilderMinimalViableProduct() { bilder->producPartA(); }
+	void BilderFullProduct() { bilder->producPartA(); bilder->producPartB(); bilder->producPartC(); }
+
+	Direktor() {}
+	~Direktor() {}
+
+private:
+	Bilder* bilder;
+
+};
+
+void ClientCode(Direktor& director)
+{
+	concretBilder1* bilder = new  concretBilder1();
+	director.set_bilder(bilder);
+	cout << "стандартный базовый продукт: \n";
+	director.BilderMinimalViableProduct();
+	Produkt* p = bilder->getProduct();
+	p->ListParets();
+	delete p;
+	cout << "полная версия дома:\n";
+	director.BilderFullProduct();
+	p = bilder->getProduct();
+	p->ListParets();
+	delete p;
+	delete bilder;
+}
+void ClientCode2(Direktor& director)
+{
+	concretBilder2* bilder1 = new  concretBilder2();
+	director.set_bilder(bilder1);
+	cout << "стандартный базовый продукт 2: \n";
+	director.BilderMinimalViableProduct();
+	Produkt* p1 = bilder1->getProduct();
+	p1->ListParets();
+	delete p1;
+	cout << "другая версия дома 2:\n";
+	director.BilderFullProduct();
+	p1 = bilder1->getProduct();
+	p1->ListParets();
+	delete p1;
+	delete bilder1;
+}
+
+int main()
+{
+	system("chcp 1251");
+
+	Direktor* director = new Direktor();
+	ClientCode(*director);
+	delete director;
+
+	Direktor* director1 = new Direktor();
+	ClientCode2(*director);
+	delete director1;
+
+	return 0;
+}
